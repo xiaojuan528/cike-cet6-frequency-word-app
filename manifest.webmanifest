@@ -1,0 +1,19 @@
+{
+  "name": "词刻 · 六级词频随手背",
+  "short_name": "词频词刻",
+  "description": "基于近三年六级真题词频的四选一背单词应用",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f2",
+  "theme_color": "#0d6b61",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

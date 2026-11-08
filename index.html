@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0d6b61" />
+    <meta
+      name="description"
+      content="基于近三年六级真题词频整理的随手背单词应用。"
+    />
+    <title>词刻 · 六级词频随手背</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <i data-lucide="book-marked"></i>
+          </div>
+          <div>
+            <h1>词刻</h1>
+            <p>六级真题 · 词频随手背</p>
+          </div>
+        </div>
+        <button
+          id="quick-review"
+          class="icon-button"
+          type="button"
+          aria-label="复习错词"
+          title="复习错词"
+        >
+          <i data-lucide="rotate-ccw"></i>
+        </button>
+      </header>
+
+      <main class="main">
+        <section id="study-view" class="view study-view" aria-label="背单词">
+          <div class="study-toolbar">
+            <div class="segmented" role="group" aria-label="选择词汇级别">
+              <button class="segment active" data-level="全部" type="button">全部</button>
+              <button class="segment" data-level="高频" type="button">高频</button>
+              <button class="segment" data-level="中频" type="button">中频</button>
+              <button class="segment" data-level="低频" type="button">低频</button>
+            </div>
+            <div class="round-meta">
+              <span id="review-label" class="review-label hidden">错词复习</span>
+              <span>今日 <strong id="today-count">0</strong></span>
+            </div>
+          </div>
+
+          <div id="loading-state" class="loading-state">
+            <div class="loader" aria-hidden="true"></div>
+            <p>正在翻开词表</p>
+          </div>
+
+          <article id="word-card" class="word-card hidden" aria-live="polite">
+            <div class="word-card-top">
+              <div class="word-badges">
+                <span id="word-level" class="level-chip">高频</span>
+                <span id="word-number" class="word-number">第 1 题</span>
+                <span id="mastery-progress" class="mastery-progress hidden">1 / 3</span>
+              </div>
+              <button
+                id="speak-button"
+                class="audio-button"
+                type="button"
+                aria-label="朗读单词"
+                title="朗读单词"
+              >
+                <i data-lucide="volume-2"></i>
+              </button>
+            </div>
+
+            <div class="word-prompt">
+              <h2 id="word-text">abbreviation</h2>
+              <p id="word-ipa" class="ipa">/əˌbriː.viˈeɪ.ʃən/</p>
+              <p id="word-pos" class="word-pos">noun</p>
+              <p id="word-frequency" class="word-frequency">词频 #100 · 出现 95 次</p>
+            </div>
+
+            <div class="question-label">
+              <span>选择正确释义</span>
+              <span id="wrong-hint" class="wrong-hint"></span>
+            </div>
+            <div id="options" class="options"></div>
+
+            <section id="answer-panel" class="answer-panel hidden">
+              <div class="answer-status">
+                <span id="answer-icon" class="answer-icon"></span>
+                <strong id="answer-title">回答正确</strong>
+              </div>
+              <p id="mastery-message" class="mastery-message"></p>
+              <p id="result-frequency" class="result-frequency"></p>
+
+              <div class="answer-section">
+                <span class="section-label">释义</span>
+                <p id="result-meaning"></p>
+              </div>
+
+              <div class="answer-section example-section">
+                <span class="section-label">双语例句</span>
+                <p id="result-example" class="example-en"></p>
+                <p id="result-example-zh" class="example-zh"></p>
+              </div>
+
+              <details class="definition-details">
+                <summary>
+                  <span>英文释义</span>
+                  <span id="definition-source" class="subtle-tag"></span>
+                  <i data-lucide="chevron-down"></i>
+                </summary>
+                <p id="result-definition"></p>
+              </details>
+
+              <details class="definition-details">
+                <summary>
+                  <span>合并词形</span>
+                  <i data-lucide="chevron-down"></i>
+                </summary>
+                <p id="result-forms"></p>
+              </details>
+
+              <button id="next-button" class="primary-button" type="button">
+                下一个
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </section>
+          </article>
+
+          <div id="study-complete" class="empty-state hidden">
+            <div class="empty-icon"><i data-lucide="badge-check"></i></div>
+            <h3>当前范围已全部掌握</h3>
+            <p>换一个级别继续，或查看已掌握词表。</p>
+            <button id="view-mastered" class="compact-button complete-button" type="button">
+              <i data-lucide="badge-check"></i>
+              查看已掌握
+            </button>
+          </div>
+        </section>
+
+        <section id="wrong-view" class="view hidden" aria-label="错题本">
+          <div class="view-heading">
+            <div>
+              <p class="eyebrow">WRONG BOOK</p>
+              <h2>错题本</h2>
+            </div>
+            <span id="wrong-total" class="count-chip">0 个</span>
+          </div>
+
+          <div class="wrong-actions">
+            <label class="search-field">
+              <i data-lucide="search"></i>
+              <input id="wrong-search" type="search" placeholder="搜索错词" autocomplete="off" />
+            </label>
+            <button id="review-wrong" class="compact-button" type="button">
+              <i data-lucide="play"></i>
+              练错词
+            </button>
+          </div>
+
+          <div id="wrong-list" class="wrong-list"></div>
+          <div id="wrong-empty" class="empty-state hidden">
+            <div class="empty-icon"><i data-lucide="circle-check-big"></i></div>
+            <h3>还没有错题</h3>
+            <p>答错的单词会自动收进这里。</p>
+          </div>
+        </section>
+
+        <section id="mastered-view" class="view hidden" aria-label="已掌握词汇">
+          <div class="view-heading">
+            <div>
+              <p class="eyebrow">MASTERED</p>
+              <h2>已掌握</h2>
+            </div>
+            <span id="mastered-total" class="count-chip">0 个</span>
+          </div>
+
+          <div class="mastered-actions">
+            <label class="search-field">
+              <i data-lucide="search"></i>
+              <input id="mastered-search" type="search" placeholder="搜索已掌握词" autocomplete="off" />
+            </label>
+          </div>
+
+          <div id="mastered-list" class="wrong-list"></div>
+          <div id="mastered-empty" class="empty-state hidden">
+            <div class="empty-icon"><i data-lucide="badge-check"></i></div>
+            <h3>还没有已掌握词</h3>
+            <p>连续答对同一个词 3 次后会出现在这里。</p>
+          </div>
+        </section>
+
+        <section id="stats-view" class="view hidden" aria-label="学习统计">
+          <div class="view-heading">
+            <div>
+              <p class="eyebrow">PROGRESS</p>
+              <h2>学习统计</h2>
+            </div>
+            <button
+              id="reset-progress"
+              class="icon-button ghost"
+              type="button"
+              aria-label="清空学习记录"
+              title="清空学习记录"
+            >
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+
+          <div class="metrics-strip">
+            <div class="metric">
+              <span id="metric-attempts">0</span>
+              <p>累计答题</p>
+            </div>
+            <div class="metric">
+              <span id="metric-accuracy">0%</span>
+              <p>正确率</p>
+            </div>
+            <div class="metric">
+              <span id="metric-wrong">0</span>
+              <p>错词数</p>
+            </div>
+            <div class="metric">
+              <span id="metric-mastered">0</span>
+              <p>已掌握</p>
+            </div>
+          </div>
+
+          <section class="progress-section">
+            <div class="section-heading">
+              <h3>词汇进度</h3>
+              <span id="unique-count">已练 0 词</span>
+            </div>
+            <div class="progress-row">
+              <div class="progress-row-head">
+                <span>高频词汇</span>
+                <span id="progress-high-text">0 / 699</span>
+              </div>
+              <div class="progress-track">
+                <div id="progress-high" class="progress-fill high"></div>
+              </div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-row-head">
+                <span>中频词汇</span>
+                <span id="progress-medium-text">0 / 986</span>
+              </div>
+              <div class="progress-track">
+                <div id="progress-medium" class="progress-fill medium"></div>
+              </div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-row-head">
+                <span>低频词汇</span>
+                <span id="progress-low-text">0 / 803</span>
+              </div>
+              <div class="progress-track">
+                <div id="progress-low" class="progress-fill low"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="mistake-section">
+            <div class="section-heading">
+              <h3>错误最多</h3>
+              <span>TOP 5</span>
+            </div>
+            <div id="top-mistakes" class="top-mistakes"></div>
+            <div id="top-mistakes-empty" class="mini-empty hidden">
+              暂无错题记录
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="主导航">
+        <button class="nav-item active" data-view="study" type="button">
+          <i data-lucide="book-open"></i>
+          <span>学习</span>
+        </button>
+        <button class="nav-item" data-view="wrong" type="button">
+          <span class="nav-icon-wrap">
+            <i data-lucide="notebook-tabs"></i>
+            <span id="wrong-badge" class="nav-badge hidden">0</span>
+          </span>
+          <span>错题本</span>
+        </button>
+        <button class="nav-item" data-view="mastered" type="button">
+          <i data-lucide="badge-check"></i>
+          <span>已掌握</span>
+        </button>
+        <button class="nav-item" data-view="stats" type="button">
+          <i data-lucide="chart-no-axes-column"></i>
+          <span>统计</span>
+        </button>
+      </nav>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <script src="./vendor/lucide.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
